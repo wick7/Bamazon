@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "",
+  password: "clarks77",
   database: "bamazon"
 });
 
@@ -32,11 +32,6 @@ var connection = mysql.createConnection({
       }
       
         inquirer.prompt([
-            // {
-            //     type: "input",
-            //     name: "item_id",
-            //     message: "Enter the Product ID of the Item you would like to purchase: "
-            // },
             {
                 type: "list",
                 name: "product",
@@ -59,10 +54,16 @@ var connection = mysql.createConnection({
                     readProducts();
                 }else if(res[0].stock_quantity >= answers.units) {
                     var newStock = res[0].stock_quantity - answers.units;
-                    console.log("Updating all " + answers.product + " quantities...\n");
-                    console.log("Previous " + answers.product + " stock " + res[0].stock_quantity);
-                    console.log("---------------------------------------")
-                    console.log("New " + answers.product + " stock " + newStock);
+                    // console.log("Updating all " + answers.product + " quantities...\n");
+                    // console.log("Previous " + answers.product + " stock " + res[0].stock_quantity);
+                    // console.log("---------------------------------------")
+                    // console.log("New " + answers.product + " stock " + newStock);
+
+                   console.log(`Updating all ${answers.product} quantities...\n
+                    Previous ${answers.product} stock ${res[0].stock_quantity}
+                    ---------------------------------------------------
+                    New ${answers.product} stock ${newStock}`);
+
                     updateProducts(newStock, answers.product, answers.units)
                 }
               });
