@@ -17,21 +17,7 @@ var connection = mysql.createConnection({
 
 
   function readProducts() {
-    // console.log("Selecting all products...\n");
-    // connection.query("SELECT * FROM products", function(err, res) {
-    //   if (err) throw err;
-      // Log all results of the SELECT statement
-    //   console.log(res);
-    // var currentChoices = []
-    //   for(var i in res) { 
-    //       var final = `
-    //         ${res[i].product_name} | $${res[i].price} | ID: ${res[i].item_id}
-    //       `
-    //       console.log(final)
-    //       currentChoices.push(res[i].product_name)
-    //   }
-    //});
-
+  
     inquirer.prompt([
         {
             type: "list",
@@ -58,7 +44,6 @@ var connection = mysql.createConnection({
             console.log("Idk what happened")
               break;
           }
-          
     });
   }
 
@@ -113,20 +98,25 @@ function addToInventory() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM products", function(err, res) {
       if (err) throw err;
-    //   Log all results of the SELECT statement
-    //   console.log(res);
+  
+    var currentStock = []
+    var currentChoices = [];
 
-    var currentStock;
-
-    var currentChoices = []
       for(var i in res) { 
         var final = `
         ${res[i].product_name} | $${res[i].price} | ID: ${res[i].item_id} | Dept: ${res[i].department_name} | Stock: ${res[i].stock_quantity}
       `
+          
           console.log(final)
           currentChoices.push(res[i].product_name)
-          currentStock = res[i].stock_quantity;
+        //   currentStock = res[i].stock_quantity;
+
+        currentStock.push({
+              item: res[i].product_name,
+              stock: res[i].stock_quantity
+          })
       }
+      
       inquirer.prompt([
         {
             type: "list",
@@ -141,8 +131,15 @@ function addToInventory() {
         },
     ]).then(function(answers) {
         ///FIX HERE - STOCK NOT ADDING
-        // var newStock = parsInt(currentStock) + parsInt(answers.stock);
-        console.log(newStock)
+        // console.log(currentStock)
+        var newStock = parseInt(answers.stock);
+
+        for(var i in currentStock) {
+            if(answers.product === currentStock[i].item) {
+                newStock = newStock + currentStock[i].stock
+            }
+        }
+        
         var query = connection.query(
             "UPDATE products SET ? WHERE ?",
             [
@@ -153,47 +150,60 @@ function addToInventory() {
                   product_name: answers.product
               }
             ],
-            function(err, res) {
-              console.log("\n" + res.affectedRows + " stock update!\n");
-            }
           );
           connection.end();
-    });
+        });
+        
     });
 }
+
 
 function addNewProduct() {
     console.log("Add New Product")
-}
-
-
-
-// select * from products
-
-function updateProducts(stockUpdate, product, quantity) {
-    
-    var query = connection.query(
-      "UPDATE products SET ? WHERE ?",
-      [
+    inquirer.prompt([
         {
-            stock_quantity: stockUpdate
-        },
+            type: "input",
+            name: "itemId",
+            message: "Enter 4 digit unique item id: ",      
+        }, 
         {
-            product_name: product
-        }
-      ],
-      function(err, res) {
-        console.log("\n" + res.affectedRows + " stock update!\n");
-      }
-    );
-    // console.log(query.sql);
-    connection.query(`SELECT price FROM products WHERE product_name = "${product}"`, function(err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log(`Total Due = $${quantity * res[0].price} \n`);
-        connection.end();
-      });
+            type: "input",
+            name: "productName",
+            message: "Enter product name: ",      
+        }, 
+        {
+            type: "input",
+            name: "deptName",
+            message: "Enter department name: ",      
+        }, 
+        {
+            type: "input",
+            name: "price",
+            message: "Enter price: ",      
+        }, 
+        {
+            type: "input",
+            name: "stockQ",
+            message: "Enter initial stock quanitity: ",      
+        }, 
+    ]).then(function(answers) {
+        var query = connection.query(
+            "INSERT INTO products SET ?",
+            {
+              item_id: answers.itemId,
+              product_name: answers.productName,
+              department_name: answers.deptName,
+              price: answers.price,
+              stock_quantity: answers.stockQ,
+      
+            },
+          );
+          connection.end();
+    });
   }
+
+
+
 
 
 
