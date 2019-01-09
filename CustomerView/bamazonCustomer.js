@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "clarks77",
+  password: "",
   database: "bamazon"
 });
 
@@ -35,7 +35,7 @@ var connection = mysql.createConnection({
             {
                 type: "list",
                 name: "product",
-                message: "Please select you item: ",
+                message: "Please select your item: ",
                 choices: currentChoices
             }, 
             {
